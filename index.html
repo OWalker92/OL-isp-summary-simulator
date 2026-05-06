@@ -13,26 +13,47 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 .hero-icon { font-size: 38px; line-height: 1; }
 .hero h1 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
 .hero p { font-size: 13px; opacity: 0.6; }
-.api-bar { background: #fffbeb; border: 1px solid #fde68a; border-radius: 12px; padding: 14px 18px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-.api-bar label { font-size: 12px; font-weight: 700; color: #92400e; white-space: nowrap; }
-.api-bar input { flex: 1; min-width: 200px; padding: 7px 11px; border: 1.5px solid #fcd34d; border-radius: 8px; font-size: 13px; font-family: monospace; color: #333; outline: none; background: white; }
-.api-bar input:focus { border-color: #f59e0b; }
-.api-bar button { padding: 7px 16px; background: #f59e0b; color: white; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
-.api-bar button:hover { background: #d97706; }
-.api-saved { font-size: 11.5px; color: #16a34a; font-weight: 600; }
-.api-bar .hint { font-size: 11px; color: #b45309; width: 100%; margin-top: -4px; }
+
+/* Keys panel */
+.keys-panel { background: #fffbeb; border: 1px solid #fde68a; border-radius: 12px; padding: 16px 18px; margin-bottom: 20px; }
+.keys-panel-title { font-size: 11px; font-weight: 700; color: #92400e; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+.key-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+.key-row:last-child { margin-bottom: 0; }
+.key-row label { font-size: 12px; font-weight: 700; color: #92400e; white-space: nowrap; min-width: 110px; }
+.key-row input { flex: 1; min-width: 180px; padding: 7px 11px; border: 1.5px solid #fcd34d; border-radius: 8px; font-size: 13px; font-family: monospace; color: #333; outline: none; background: white; }
+.key-row input:focus { border-color: #f59e0b; }
+.key-row button { padding: 7px 14px; background: #f59e0b; color: white; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.key-row button:hover { background: #d97706; }
+.key-saved { font-size: 11px; color: #16a34a; font-weight: 600; white-space: nowrap; }
+.keys-hint { font-size: 11px; color: #b45309; margin-top: 8px; }
+
+/* Layout */
 .layout { display: grid; grid-template-columns: 340px 1fr; gap: 20px; align-items: start; }
 @media (max-width: 700px) { .layout { grid-template-columns: 1fr; } }
 .card { background: white; border-radius: 14px; padding: 22px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
 .card-label { font-size: 11px; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 16px; }
 .field { margin-bottom: 14px; }
 .field label { display: block; font-size: 11.5px; font-weight: 600; color: #555; margin-bottom: 5px; }
-input[type=text], textarea { width: 100%; padding: 9px 12px; border: 1.5px solid #e8e8ec; border-radius: 8px; font-size: 13px; color: #222; background: white; outline: none; transition: border-color 0.15s; font-family: inherit; }
-input[type=text]:focus, textarea:focus { border-color: #6366f1; }
+input[type=text], textarea, select { width: 100%; padding: 9px 12px; border: 1.5px solid #e8e8ec; border-radius: 8px; font-size: 13px; color: #222; background: white; outline: none; transition: border-color 0.15s; font-family: inherit; }
+input[type=text]:focus, textarea:focus, select:focus { border-color: #6366f1; }
 textarea { height: 130px; resize: vertical; line-height: 1.5; }
-.generate-btn { width: 100%; margin-top: 18px; padding: 12px; border: none; border-radius: 10px; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; font-size: 14px; font-weight: 600; cursor: pointer; transition: opacity 0.2s; }
+select { cursor: pointer; appearance: auto; }
+select:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Klaviyo row */
+.klaviyo-row { display: flex; gap: 8px; align-items: flex-end; margin-bottom: 14px; }
+.klaviyo-row .field { flex: 1; margin-bottom: 0; }
+.load-btn { padding: 9px 14px; background: #6366f1; color: white; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+.load-btn:hover { background: #4f46e5; }
+.load-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.divider { display: flex; align-items: center; gap: 10px; margin: 14px 0; color: #ccc; font-size: 11px; font-weight: 600; }
+.divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: #eee; }
+
+.generate-btn { width: 100%; margin-top: 4px; padding: 12px; border: none; border-radius: 10px; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; font-size: 14px; font-weight: 600; cursor: pointer; transition: opacity 0.2s; }
 .generate-btn:hover:not(:disabled) { opacity: 0.9; }
 .generate-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* Results */
 .placeholder { background: white; border-radius: 14px; padding: 64px 24px; text-align: center; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
 .placeholder .ph-icon { font-size: 40px; margin-bottom: 14px; }
 .placeholder p { font-size: 13.5px; color: #bbb; line-height: 1.6; }
@@ -75,17 +96,39 @@ textarea { height: 130px; resize: vertical; line-height: 1.5; }
     </div>
   </div>
 
-  <div class="api-bar" id="api-bar">
-    <label>🔑 Shared API Key</label>
-    <input type="password" id="api-key-input" placeholder="sk-ant-api03-...">
-    <button onclick="saveKey()">Save</button>
-    <span class="api-saved" id="api-status" style="display:none;">✓ Saved — you won't need to do this again</span>
-    <span class="hint" id="api-hint">Paste the team API key once — it saves in your browser automatically.</span>
+  <div class="keys-panel">
+    <div class="keys-panel-title">🔑 API Keys — paste once, saved in your browser forever</div>
+    <div class="key-row">
+      <label>Anthropic Key</label>
+      <input type="password" id="anthropic-key-input" placeholder="sk-ant-api03-...">
+      <button onclick="saveAnthropicKey()">Save</button>
+      <span class="key-saved" id="anthropic-status" style="display:none;">✓ Saved</span>
+    </div>
+    <div class="key-row">
+      <label>Klaviyo Key</label>
+      <input type="password" id="klaviyo-key-input" placeholder="pk_...">
+      <button onclick="saveKlaviyoKey()">Save</button>
+      <span class="key-saved" id="klaviyo-status" style="display:none;">✓ Saved</span>
+    </div>
+    <div class="keys-hint">Both keys are stored only in your browser. Get your Anthropic key at console.anthropic.com → API Keys. Get your Klaviyo key at klaviyo.com → Settings → API Keys (use a Private Key).</div>
   </div>
 
   <div class="layout">
     <div class="card">
       <div class="card-label">Email Content</div>
+
+      <div class="klaviyo-row">
+        <div class="field">
+          <label>Load from Klaviyo</label>
+          <select id="campaign-select" disabled>
+            <option value="">— save Klaviyo key to load campaigns —</option>
+          </select>
+        </div>
+        <button class="load-btn" id="load-btn" onclick="loadCampaigns()" disabled>Load</button>
+      </div>
+
+      <div class="divider">or paste manually</div>
+
       <div class="field">
         <label>Subject Line</label>
         <input type="text" id="subject" placeholder="e.g. This month's cheat code 🔓">
@@ -104,32 +147,168 @@ textarea { height: 130px; resize: vertical; line-height: 1.5; }
     <div id="results">
       <div class="placeholder">
         <div class="ph-icon">📭</div>
-        <p>Paste your email content and click<br>Generate to see AI previews.</p>
+        <p>Load a campaign or paste your content,<br>then click Generate to see AI previews.</p>
       </div>
     </div>
   </div>
 </div>
 
 <script>
-const API_URL = 'https://api.anthropic.com/v1/messages';
+const ANTHROPIC_URL = 'https://api.anthropic.com/v1/messages';
+const KLAVIYO_BASE = 'https://a.klaviyo.com/api';
+const KLAVIYO_REVISION = '2024-02-15';
 
+// ── On load: restore saved keys ──────────────────────────────────────────────
 window.addEventListener('load', function() {
-  var saved = localStorage.getItem('ooze_isp_api_key');
-  if (saved) {
-    document.getElementById('api-key-input').value = saved;
-    document.getElementById('api-status').style.display = 'inline';
-    document.getElementById('api-hint').style.display = 'none';
+  var ak = localStorage.getItem('ooze_anthropic_key');
+  if (ak) {
+    document.getElementById('anthropic-key-input').value = ak;
+    document.getElementById('anthropic-status').style.display = 'inline';
+  }
+  var kk = localStorage.getItem('ooze_klaviyo_key');
+  if (kk) {
+    document.getElementById('klaviyo-key-input').value = kk;
+    document.getElementById('klaviyo-status').style.display = 'inline';
+    enableKlaviyoUI();
   }
 });
 
-function saveKey() {
-  var k = document.getElementById('api-key-input').value.trim();
-  if (!k) { alert('Please paste the API key first.'); return; }
-  localStorage.setItem('ooze_isp_api_key', k);
-  document.getElementById('api-status').style.display = 'inline';
-  document.getElementById('api-hint').style.display = 'none';
+function saveAnthropicKey() {
+  var k = document.getElementById('anthropic-key-input').value.trim();
+  if (!k) { alert('Please paste your Anthropic API key first.'); return; }
+  localStorage.setItem('ooze_anthropic_key', k);
+  document.getElementById('anthropic-status').style.display = 'inline';
 }
 
+function saveKlaviyoKey() {
+  var k = document.getElementById('klaviyo-key-input').value.trim();
+  if (!k) { alert('Please paste your Klaviyo private key first.'); return; }
+  localStorage.setItem('ooze_klaviyo_key', k);
+  document.getElementById('klaviyo-status').style.display = 'inline';
+  enableKlaviyoUI();
+}
+
+function enableKlaviyoUI() {
+  document.getElementById('campaign-select').disabled = false;
+  document.getElementById('load-btn').disabled = false;
+  var sel = document.getElementById('campaign-select');
+  if (sel.options.length === 1) {
+    sel.options[0].text = '— click Load to fetch campaigns —';
+  }
+}
+
+// ── Klaviyo: load campaigns ───────────────────────────────────────────────────
+async function loadCampaigns() {
+  var kk = localStorage.getItem('ooze_klaviyo_key') || document.getElementById('klaviyo-key-input').value.trim();
+  if (!kk) { alert('Please save your Klaviyo key first.'); return; }
+
+  var btn = document.getElementById('load-btn');
+  var sel = document.getElementById('campaign-select');
+  btn.disabled = true; btn.textContent = '...';
+  sel.innerHTML = '<option value="">Loading campaigns...</option>';
+
+  try {
+    // Fetch email campaigns, sorted newest first
+    var url = KLAVIYO_BASE + '/campaigns/?filter=equals(messages.channel,%27email%27)&sort=-created&page[size]=50';
+    var res = await fetch(url, {
+      headers: { 'Authorization': 'Klaviyo-API-Key ' + kk, 'revision': KLAVIYO_REVISION }
+    });
+    if (!res.ok) { var e = await res.json().catch(function(){return {};}); throw new Error(e.errors ? e.errors[0].detail : 'Klaviyo error ' + res.status); }
+    var data = await res.json();
+    var campaigns = data.data || [];
+
+    if (!campaigns.length) {
+      sel.innerHTML = '<option value="">No email campaigns found</option>';
+      return;
+    }
+
+    // Deduplicate by name (keep most recent)
+    var seen = {};
+    var deduped = [];
+    campaigns.forEach(function(c) {
+      var name = c.attributes.name;
+      if (!seen[name]) { seen[name] = true; deduped.push(c); }
+    });
+
+    sel.innerHTML = '<option value="">— select a campaign —</option>';
+    deduped.forEach(function(c) {
+      var opt = document.createElement('option');
+      opt.value = c.id;
+      opt.textContent = c.attributes.name;
+      // Store subject/preview on the option element for quick access
+      var msgs = c.attributes.campaign_messages || [];
+      if (msgs.length) {
+        opt.dataset.subject = msgs[0].label || '';
+      }
+      sel.appendChild(opt);
+    });
+
+    // Store full campaign data for lookup
+    window._campaignData = {};
+    deduped.forEach(function(c) { window._campaignData[c.id] = c; });
+
+    sel.onchange = onCampaignSelected;
+
+  } catch(err) {
+    sel.innerHTML = '<option value="">Error loading — check your Klaviyo key</option>';
+    console.error(err);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Load';
+  }
+}
+
+async function onCampaignSelected() {
+  var sel = document.getElementById('campaign-select');
+  var id = sel.value;
+  if (!id) return;
+
+  var campaign = window._campaignData && window._campaignData[id];
+  if (!campaign) return;
+
+  var kk = localStorage.getItem('ooze_klaviyo_key') || document.getElementById('klaviyo-key-input').value.trim();
+
+  // Get campaign messages to find subject, preview, and template id
+  try {
+    sel.disabled = true;
+    var msgUrl = KLAVIYO_BASE + '/campaign-messages/?filter=equals(campaign.id,%27' + id + '%27)';
+    var msgRes = await fetch(msgUrl, {
+      headers: { 'Authorization': 'Klaviyo-API-Key ' + kk, 'revision': KLAVIYO_REVISION }
+    });
+    if (!msgRes.ok) throw new Error('Could not load campaign messages');
+    var msgData = await msgRes.json();
+    var messages = msgData.data || [];
+    if (!messages.length) throw new Error('No messages found for this campaign');
+
+    var msg = messages[0];
+    var subject = msg.attributes.subject || '';
+    var preview = msg.attributes.preview_text || '';
+    document.getElementById('subject').value = subject;
+    document.getElementById('preview').value = preview;
+
+    // Try to fetch template HTML
+    var templateId = msg.relationships && msg.relationships.template && msg.relationships.template.data && msg.relationships.template.data.id;
+    if (templateId) {
+      var tplRes = await fetch(KLAVIYO_BASE + '/templates/' + templateId + '/', {
+        headers: { 'Authorization': 'Klaviyo-API-Key ' + kk, 'revision': KLAVIYO_REVISION }
+      });
+      if (tplRes.ok) {
+        var tplData = await tplRes.json();
+        var html = tplData.data && tplData.data.attributes && tplData.data.attributes.html;
+        if (html) {
+          document.getElementById('body').value = stripHtml(html);
+        }
+      }
+    }
+
+  } catch(err) {
+    console.warn('Could not auto-fill from campaign:', err.message);
+    // Non-fatal — user can still paste manually
+  } finally {
+    sel.disabled = false;
+  }
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
 function esc(str) {
   if (!str) return '';
   return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -142,9 +321,10 @@ function stripHtml(html) {
   return (d.innerText || d.textContent || '').replace(/\s+/g,' ').trim().substring(0, 3000);
 }
 
+// ── Generate summaries ────────────────────────────────────────────────────────
 async function generate() {
-  var apiKey = localStorage.getItem('ooze_isp_api_key') || document.getElementById('api-key-input').value.trim();
-  if (!apiKey) { alert('Please paste the team API key and hit Save first — you\'ll only need to do this once.'); return; }
+  var apiKey = localStorage.getItem('ooze_anthropic_key') || document.getElementById('anthropic-key-input').value.trim();
+  if (!apiKey) { alert('Please paste and save your Anthropic API key first.'); return; }
 
   var subject = document.getElementById('subject').value.trim();
   var preview = document.getElementById('preview').value.trim();
@@ -154,13 +334,12 @@ async function generate() {
 
   var btn = document.getElementById('generate-btn');
   btn.disabled = true; btn.textContent = '⏳ Generating...';
-
   document.getElementById('results').innerHTML = '<div class="loading-panel"><div class="spinner"></div><div class="loading-label">Simulating AI summaries across 5 email clients...</div></div>';
 
   var prompt = 'You are simulating how different email client AI systems summarize marketing emails. The brand is Ooze Life, a cannabis vaporizer company with a fun, irreverent tone.\n\nEmail details:\nSubject: ' + subject + '\nPreview Text: ' + preview + '\nBody: ' + (body ? body.substring(0,2000) : '(not available)') + '\n\nReturn ONLY a valid JSON object, no markdown, no code fences:\n{"gmail":"...","apple_mail":"...","outlook":"...","yahoo":"...","hotmail":"..."}\n\nRules:\n- gmail: 1-2 sentences in Gmail\'s blue Summary box. Neutral, informative. Do not start with "This email".\n- apple_mail: One phrase under 85 chars for the iOS Mail inbox preview. Ultra-concise.\n- outlook: 2-3 sentences in Copilot\'s summary panel. Professional, surfaces key offer and action.\n- yahoo: 1-2 sentences as Yahoo\'s AI preview. Casual, benefit-focused.\n- hotmail: 1-2 sentences in Outlook.com reading pane. Clear and direct.';
 
   try {
-    var res = await fetch(API_URL, {
+    var res = await fetch(ANTHROPIC_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
       body: JSON.stringify({ model: 'claude-haiku-4-5-20251001', max_tokens: 1024, messages: [{ role: 'user', content: prompt }] })
@@ -179,6 +358,7 @@ async function generate() {
   }
 }
 
+// ── Render ISP cards ──────────────────────────────────────────────────────────
 function renderResults(s, subject) {
   document.getElementById('results').innerHTML = '<div class="isp-cards">'
   + '<div class="isp-card gmail"><div class="isp-header"><div class="isp-logo" style="background:white;border:1px solid #eee;"><svg width="18" height="14" viewBox="0 0 24 18" fill="none"><path d="M0 1.636A1.636 1.636 0 0 1 1.636 0L12 8.182 22.364 0A1.636 1.636 0 0 1 24 1.636L12 11.455 0 1.636z" fill="#EA4335"/><path d="M0 1.636v14.728A1.636 1.636 0 0 0 1.636 18h2.728V5.727L0 1.636z" fill="#34A853"/><path d="M24 1.636v14.728A1.636 1.636 0 0 1 22.364 18h-2.728V5.727L24 1.636z" fill="#4285F4"/><path d="M4.364 18V5.727L12 11.455l7.636-5.728V18H4.364z" fill="#FBBC05"/></svg></div><span class="isp-name" style="color:#444;">Gmail</span><span class="isp-badge" style="background:#e8f0fe;color:#1967d2;">✦ Google AI</span></div><div class="isp-body"><div class="email-row"><div class="avatar" style="background:#ea4335;">O</div><div class="email-content"><div class="email-sender">Ooze Life</div><div class="email-subject">' + esc(subject) + '</div><div class="ai-block"><div class="ai-tag" style="color:#1967d2;">✦ Summary</div><div class="ai-text">' + esc(s.gmail) + '</div></div></div><div class="email-time">now</div></div></div></div>'
