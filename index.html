@@ -40,14 +40,6 @@ textarea { height: 130px; resize: vertical; line-height: 1.5; }
 select { cursor: pointer; appearance: auto; }
 select:disabled { opacity: 0.5; cursor: not-allowed; }
 
-/* Klaviyo row */
-.klaviyo-row { display: flex; gap: 8px; align-items: flex-end; margin-bottom: 14px; }
-.klaviyo-row .field { flex: 1; margin-bottom: 0; }
-.load-btn { padding: 9px 14px; background: #6366f1; color: white; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
-.load-btn:hover { background: #4f46e5; }
-.load-btn:disabled { opacity: 0.45; cursor: not-allowed; }
-.divider { display: flex; align-items: center; gap: 10px; margin: 14px 0; color: #ccc; font-size: 11px; font-weight: 600; }
-.divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: #eee; }
 
 .generate-btn { width: 100%; margin-top: 4px; padding: 12px; border: none; border-radius: 10px; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; font-size: 14px; font-weight: 600; cursor: pointer; transition: opacity 0.2s; }
 .generate-btn:hover:not(:disabled) { opacity: 0.9; }
@@ -97,37 +89,19 @@ select:disabled { opacity: 0.5; cursor: not-allowed; }
   </div>
 
   <div class="keys-panel">
-    <div class="keys-panel-title">🔑 API Keys — paste once, saved in your browser forever</div>
+    <div class="keys-panel-title">🔑 API Key — paste once, saved in your browser forever</div>
     <div class="key-row">
       <label>Anthropic Key</label>
       <input type="password" id="anthropic-key-input" placeholder="sk-ant-api03-...">
       <button onclick="saveAnthropicKey()">Save</button>
       <span class="key-saved" id="anthropic-status" style="display:none;">✓ Saved</span>
     </div>
-    <div class="key-row">
-      <label>Klaviyo Key</label>
-      <input type="password" id="klaviyo-key-input" placeholder="pk_...">
-      <button onclick="saveKlaviyoKey()">Save</button>
-      <span class="key-saved" id="klaviyo-status" style="display:none;">✓ Saved</span>
-    </div>
-    <div class="keys-hint">Both keys are stored only in your browser. Get your Anthropic key at console.anthropic.com → API Keys. Get your Klaviyo key at klaviyo.com → Settings → API Keys (use a Private Key).</div>
+    <div class="keys-hint">Your key is stored only in your browser. Get it at console.anthropic.com → API Keys.</div>
   </div>
 
   <div class="layout">
     <div class="card">
       <div class="card-label">Email Content</div>
-
-      <div class="klaviyo-row">
-        <div class="field">
-          <label>Load from Klaviyo</label>
-          <select id="campaign-select" disabled>
-            <option value="">— save Klaviyo key to load campaigns —</option>
-          </select>
-        </div>
-        <button class="load-btn" id="load-btn" onclick="loadCampaigns()" disabled>Load</button>
-      </div>
-
-      <div class="divider">or paste manually</div>
 
       <div class="field">
         <label>Subject Line</label>
@@ -155,21 +129,13 @@ select:disabled { opacity: 0.5; cursor: not-allowed; }
 
 <script>
 const ANTHROPIC_URL = 'https://api.anthropic.com/v1/messages';
-const KLAVIYO_BASE = 'https://a.klaviyo.com/api';
-const KLAVIYO_REVISION = '2024-02-15';
 
-// ── On load: restore saved keys ──────────────────────────────────────────────
+// ── On load: restore saved key ───────────────────────────────────────────────
 window.addEventListener('load', function() {
   var ak = localStorage.getItem('ooze_anthropic_key');
   if (ak) {
     document.getElementById('anthropic-key-input').value = ak;
     document.getElementById('anthropic-status').style.display = 'inline';
-  }
-  var kk = localStorage.getItem('ooze_klaviyo_key');
-  if (kk) {
-    document.getElementById('klaviyo-key-input').value = kk;
-    document.getElementById('klaviyo-status').style.display = 'inline';
-    enableKlaviyoUI();
   }
 });
 
@@ -178,134 +144,6 @@ function saveAnthropicKey() {
   if (!k) { alert('Please paste your Anthropic API key first.'); return; }
   localStorage.setItem('ooze_anthropic_key', k);
   document.getElementById('anthropic-status').style.display = 'inline';
-}
-
-function saveKlaviyoKey() {
-  var k = document.getElementById('klaviyo-key-input').value.trim();
-  if (!k) { alert('Please paste your Klaviyo private key first.'); return; }
-  localStorage.setItem('ooze_klaviyo_key', k);
-  document.getElementById('klaviyo-status').style.display = 'inline';
-  enableKlaviyoUI();
-}
-
-function enableKlaviyoUI() {
-  document.getElementById('campaign-select').disabled = false;
-  document.getElementById('load-btn').disabled = false;
-  var sel = document.getElementById('campaign-select');
-  if (sel.options.length === 1) {
-    sel.options[0].text = '— click Load to fetch campaigns —';
-  }
-}
-
-// ── Klaviyo: load campaigns ───────────────────────────────────────────────────
-async function loadCampaigns() {
-  var kk = localStorage.getItem('ooze_klaviyo_key') || document.getElementById('klaviyo-key-input').value.trim();
-  if (!kk) { alert('Please save your Klaviyo key first.'); return; }
-
-  var btn = document.getElementById('load-btn');
-  var sel = document.getElementById('campaign-select');
-  btn.disabled = true; btn.textContent = '...';
-  sel.innerHTML = '<option value="">Loading campaigns...</option>';
-
-  try {
-    // Fetch email campaigns, sorted newest first
-    var url = KLAVIYO_BASE + '/campaigns/?filter=equals(messages.channel,%27email%27)&sort=-created&page[size]=50';
-    var res = await fetch(url, {
-      headers: { 'Authorization': 'Klaviyo-API-Key ' + kk, 'revision': KLAVIYO_REVISION }
-    });
-    if (!res.ok) { var e = await res.json().catch(function(){return {};}); throw new Error(e.errors ? e.errors[0].detail : 'Klaviyo error ' + res.status); }
-    var data = await res.json();
-    var campaigns = data.data || [];
-
-    if (!campaigns.length) {
-      sel.innerHTML = '<option value="">No email campaigns found</option>';
-      return;
-    }
-
-    // Deduplicate by name (keep most recent)
-    var seen = {};
-    var deduped = [];
-    campaigns.forEach(function(c) {
-      var name = c.attributes.name;
-      if (!seen[name]) { seen[name] = true; deduped.push(c); }
-    });
-
-    sel.innerHTML = '<option value="">— select a campaign —</option>';
-    deduped.forEach(function(c) {
-      var opt = document.createElement('option');
-      opt.value = c.id;
-      opt.textContent = c.attributes.name;
-      // Store subject/preview on the option element for quick access
-      var msgs = c.attributes.campaign_messages || [];
-      if (msgs.length) {
-        opt.dataset.subject = msgs[0].label || '';
-      }
-      sel.appendChild(opt);
-    });
-
-    // Store full campaign data for lookup
-    window._campaignData = {};
-    deduped.forEach(function(c) { window._campaignData[c.id] = c; });
-
-    sel.onchange = onCampaignSelected;
-
-  } catch(err) {
-    sel.innerHTML = '<option value="">Error loading — check your Klaviyo key</option>';
-    console.error(err);
-  } finally {
-    btn.disabled = false; btn.textContent = 'Load';
-  }
-}
-
-async function onCampaignSelected() {
-  var sel = document.getElementById('campaign-select');
-  var id = sel.value;
-  if (!id) return;
-
-  var campaign = window._campaignData && window._campaignData[id];
-  if (!campaign) return;
-
-  var kk = localStorage.getItem('ooze_klaviyo_key') || document.getElementById('klaviyo-key-input').value.trim();
-
-  // Get campaign messages to find subject, preview, and template id
-  try {
-    sel.disabled = true;
-    var msgUrl = KLAVIYO_BASE + '/campaign-messages/?filter=equals(campaign.id,%27' + id + '%27)';
-    var msgRes = await fetch(msgUrl, {
-      headers: { 'Authorization': 'Klaviyo-API-Key ' + kk, 'revision': KLAVIYO_REVISION }
-    });
-    if (!msgRes.ok) throw new Error('Could not load campaign messages');
-    var msgData = await msgRes.json();
-    var messages = msgData.data || [];
-    if (!messages.length) throw new Error('No messages found for this campaign');
-
-    var msg = messages[0];
-    var subject = msg.attributes.subject || '';
-    var preview = msg.attributes.preview_text || '';
-    document.getElementById('subject').value = subject;
-    document.getElementById('preview').value = preview;
-
-    // Try to fetch template HTML
-    var templateId = msg.relationships && msg.relationships.template && msg.relationships.template.data && msg.relationships.template.data.id;
-    if (templateId) {
-      var tplRes = await fetch(KLAVIYO_BASE + '/templates/' + templateId + '/', {
-        headers: { 'Authorization': 'Klaviyo-API-Key ' + kk, 'revision': KLAVIYO_REVISION }
-      });
-      if (tplRes.ok) {
-        var tplData = await tplRes.json();
-        var html = tplData.data && tplData.data.attributes && tplData.data.attributes.html;
-        if (html) {
-          document.getElementById('body').value = stripHtml(html);
-        }
-      }
-    }
-
-  } catch(err) {
-    console.warn('Could not auto-fill from campaign:', err.message);
-    // Non-fatal — user can still paste manually
-  } finally {
-    sel.disabled = false;
-  }
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -324,7 +162,7 @@ function stripHtml(html) {
 // ── Generate summaries ────────────────────────────────────────────────────────
 async function generate() {
   var apiKey = localStorage.getItem('ooze_anthropic_key') || document.getElementById('anthropic-key-input').value.trim();
-  if (!apiKey) { alert('Please paste and save your Anthropic API key first.'); return; }
+  if (!apiKey) { alert('Please paste and save the Anthropic API key first — you\'ll only need to do this once.'); return; }
 
   var subject = document.getElementById('subject').value.trim();
   var preview = document.getElementById('preview').value.trim();
