@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ISP AI Summary Simulator</title>
+<style>
+:root { color-scheme: light; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f2f3f7; min-height: 100vh; padding: 24px 16px; color: #111; }
+.app { max-width: 960px; margin: 0 auto; }
+.hero { background: linear-gradient(135deg, #0f0f23 0%, #1e1b4b 60%, #1e3a5f 100%); color: white; padding: 24px 28px; border-radius: 16px; margin-bottom: 20px; display: flex; align-items: center; gap: 16px; }
+.hero-icon { font-size: 38px; line-height: 1; }
+.hero h1 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+.hero p { font-size: 13px; opacity: 0.6; }
+.api-bar { background: #fffbeb; border: 1px solid #fde68a; border-radius: 12px; padding: 14px 18px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.api-bar label { font-size: 12px; font-weight: 700; color: #92400e; white-space: nowrap; }
+.api-bar input { flex: 1; min-width: 200px; padding: 7px 11px; border: 1.5px solid #fcd34d; border-radius: 8px; font-size: 13px; font-family: monospace; color: #333; outline: none; background: white; }
+.api-bar input:focus { border-color: #f59e0b; }
+.api-bar button { padding: 7px 16px; background: #f59e0b; color: white; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.api-bar button:hover { background: #d97706; }
+.api-saved { font-size: 11.5px; color: #16a34a; font-weight: 600; }
+.api-bar .hint { font-size: 11px; color: #b45309; width: 100%; margin-top: -4px; }
+.layout { display: grid; grid-template-columns: 340px 1fr; gap: 20px; align-items: start; }
+@media (max-width: 700px) { .layout { grid-template-columns: 1fr; } }
+.card { background: white; border-radius: 14px; padding: 22px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
+.card-label { font-size: 11px; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 16px; }
+.field { margin-bottom: 14px; }
+.field label { display: block; font-size: 11.5px; font-weight: 600; color: #555; margin-bottom: 5px; }
+input[type=text], textarea { width: 100%; padding: 9px 12px; border: 1.5px solid #e8e8ec; border-radius: 8px; font-size: 13px; color: #222; background: white; outline: none; transition: border-color 0.15s; font-family: inherit; }
+input[type=text]:focus, textarea:focus { border-color: #6366f1; }
+textarea { height: 130px; resize: vertical; line-height: 1.5; }
+.generate-btn { width: 100%; margin-top: 18px; padding: 12px; border: none; border-radius: 10px; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; font-size: 14px; font-weight: 600; cursor: pointer; transition: opacity 0.2s; }
+.generate-btn:hover:not(:disabled) { opacity: 0.9; }
+.generate-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.placeholder { background: white; border-radius: 14px; padding: 64px 24px; text-align: center; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
+.placeholder .ph-icon { font-size: 40px; margin-bottom: 14px; }
+.placeholder p { font-size: 13.5px; color: #bbb; line-height: 1.6; }
+.loading-panel { background: white; border-radius: 14px; padding: 64px 24px; text-align: center; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
+.spinner { width: 30px; height: 30px; border: 3px solid #eee; border-top-color: #6366f1; border-radius: 50%; animation: spin 0.75s linear infinite; margin: 0 auto 14px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-label { font-size: 13.5px; color: #777; }
+.isp-cards { display: flex; flex-direction: column; gap: 14px; }
+.isp-card { border-radius: 14px; overflow: hidden; box-shadow: 0 1px 6px rgba(0,0,0,0.09); }
+.isp-header { padding: 11px 16px; display: flex; align-items: center; gap: 10px; }
+.isp-logo { width: 28px; height: 28px; border-radius: 7px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: 900; }
+.isp-name { font-size: 13px; font-weight: 700; }
+.isp-badge { margin-left: auto; font-size: 10.5px; font-weight: 600; padding: 2px 8px; border-radius: 10px; white-space: nowrap; }
+.isp-body { padding: 14px 16px; background: white; }
+.email-row { display: flex; align-items: flex-start; gap: 11px; }
+.avatar { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: white; flex-shrink: 0; }
+.email-content { flex: 1; min-width: 0; }
+.email-sender { font-size: 13px; font-weight: 600; color: #111; margin-bottom: 1px; }
+.email-subject { font-size: 13px; color: #222; margin-bottom: 5px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.email-time { font-size: 11px; color: #bbb; flex-shrink: 0; margin-top: 2px; }
+.ai-block { border-radius: 8px; padding: 9px 12px; margin-top: 6px; }
+.ai-tag { font-size: 10.5px; font-weight: 700; margin-bottom: 4px; }
+.ai-text { font-size: 13px; line-height: 1.55; }
+.gmail .isp-header { background: white; border-bottom: 1px solid #f0f0f0; } .gmail .isp-name { color: #444; } .gmail .isp-badge { background: #e8f0fe; color: #1967d2; } .gmail .ai-block { background: #e8f0fe; } .gmail .ai-tag { color: #1967d2; } .gmail .ai-text { color: #1a1a2e; }
+.apple .isp-header { background: #1c1c1e; } .apple .isp-name { color: #fff; } .apple .isp-badge { background: rgba(255,255,255,0.14); color: #fff; } .apple .isp-body { background: #1c1c1e; } .apple .email-sender { color: #fff !important; } .apple .email-subject { color: rgba(255,255,255,0.9) !important; } .apple .email-time { color: #555 !important; } .apple .ai-text { color: #8e8e93; font-size: 12.5px !important; } .apple .ai-tag { color: #555; }
+.outlook .isp-header { background: #0f6cbd; } .outlook .isp-name { color: white; } .outlook .isp-badge { background: rgba(255,255,255,0.2); color: white; } .outlook .ai-block { background: #eff6ff; border-left: 3px solid #0f6cbd; border-radius: 0 8px 8px 0; } .outlook .ai-tag { color: #0f6cbd; } .outlook .ai-text { color: #1e293b; }
+.yahoo .isp-header { background: #6001d2; } .yahoo .isp-name { color: white; } .yahoo .isp-badge { background: rgba(255,255,255,0.18); color: white; } .yahoo .ai-block { background: #f5f0ff; border: 1px solid #e9d5ff; } .yahoo .ai-tag { color: #6001d2; } .yahoo .ai-text { color: #1e1b2e; }
+.hotmail .isp-header { background: #0078d4; } .hotmail .isp-name { color: white; } .hotmail .isp-badge { background: rgba(255,255,255,0.18); color: white; } .hotmail .ai-block { background: #f0f7ff; border: 1px solid #bfdbfe; } .hotmail .ai-tag { color: #0078d4; } .hotmail .ai-text { color: #1e293b; }
+.tip-bar { margin-top: 14px; background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; padding: 10px 14px; font-size: 12px; color: #92400e; line-height: 1.5; }
+.error-panel { background: white; border-radius: 14px; padding: 40px 24px; text-align: center; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="hero">
+    <div class="hero-icon">📬</div>
+    <div>
+      <h1>ISP AI Summary Simulator</h1>
+      <p>Preview how AI-powered email clients will summarize your campaigns before you send</p>
+    </div>
+  </div>
+
+  <div class="api-bar" id="api-bar">
+    <label>🔑 Shared API Key</label>
+    <input type="password" id="api-key-input" placeholder="sk-ant-api03-...">
+    <button onclick="saveKey()">Save</button>
+    <span class="api-saved" id="api-status" style="display:none;">✓ Saved — you won't need to do this again</span>
+    <span class="hint" id="api-hint">Paste the team API key once — it saves in your browser automatically.</span>
+  </div>
+
+  <div class="layout">
+    <div class="card">
+      <div class="card-label">Email Content</div>
+      <div class="field">
+        <label>Subject Line</label>
+        <input type="text" id="subject" placeholder="e.g. This month's cheat code 🔓">
+      </div>
+      <div class="field">
+        <label>Preview Text</label>
+        <input type="text" id="preview" placeholder="e.g. 250 bonus Tokins this month">
+      </div>
+      <div class="field">
+        <label>Email Body <span style="font-weight:400;color:#aaa;">(plain text or HTML)</span></label>
+        <textarea id="body" placeholder="Paste your email content here..."></textarea>
+      </div>
+      <button class="generate-btn" id="generate-btn" onclick="generate()">✨ Generate AI Summaries</button>
+    </div>
+
+    <div id="results">
+      <div class="placeholder">
+        <div class="ph-icon">📭</div>
+        <p>Paste your email content and click<br>Generate to see AI previews.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API_URL = 'https://api.anthropic.com/v1/messages';
+
+window.addEventListener('load', function() {
+  var saved = localStorage.getItem('ooze_isp_api_key');
+  if (saved) {
+    document.getElementById('api-key-input').value = saved;
+    document.getElementById('api-status').style.display = 'inline';
+    document.getElementById('api-hint').style.display = 'none';
+  }
+});
+
+function saveKey() {
+  var k = document.getElementById('api-key-input').value.trim();
+  if (!k) { alert('Please paste the API key first.'); return; }
+  localStorage.setItem('ooze_isp_api_key', k);
+  document.getElementById('api-status').style.display = 'inline';
+  document.getElementById('api-hint').style.display = 'none';
+}
+
+function esc(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function stripHtml(html) {
+  var d = document.createElement('div');
+  d.innerHTML = html;
+  d.querySelectorAll('script,style,noscript').forEach(function(e){ e.remove(); });
+  return (d.innerText || d.textContent || '').replace(/\s+/g,' ').trim().substring(0, 3000);
+}
+
+async function generate() {
+  var apiKey = localStorage.getItem('ooze_isp_api_key') || document.getElementById('api-key-input').value.trim();
+  if (!apiKey) { alert('Please paste the team API key and hit Save first — you\'ll only need to do this once.'); return; }
+
+  var subject = document.getElementById('subject').value.trim();
+  var preview = document.getElementById('preview').value.trim();
+  var body = document.getElementById('body').value.trim();
+  if (!subject && !body) { alert('Please enter a subject line or email body.'); return; }
+  if (body.includes('<')) body = stripHtml(body);
+
+  var btn = document.getElementById('generate-btn');
+  btn.disabled = true; btn.textContent = '⏳ Generating...';
+
+  document.getElementById('results').innerHTML = '<div class="loading-panel"><div class="spinner"></div><div class="loading-label">Simulating AI summaries across 5 email clients...</div></div>';
+
+  var prompt = 'You are simulating how different email client AI systems summarize marketing emails. The brand is Ooze Life, a cannabis vaporizer company with a fun, irreverent tone.\n\nEmail details:\nSubject: ' + subject + '\nPreview Text: ' + preview + '\nBody: ' + (body ? body.substring(0,2000) : '(not available)') + '\n\nReturn ONLY a valid JSON object, no markdown, no code fences:\n{"gmail":"...","apple_mail":"...","outlook":"...","yahoo":"...","hotmail":"..."}\n\nRules:\n- gmail: 1-2 sentences in Gmail\'s blue Summary box. Neutral, informative. Do not start with "This email".\n- apple_mail: One phrase under 85 chars for the iOS Mail inbox preview. Ultra-concise.\n- outlook: 2-3 sentences in Copilot\'s summary panel. Professional, surfaces key offer and action.\n- yahoo: 1-2 sentences as Yahoo\'s AI preview. Casual, benefit-focused.\n- hotmail: 1-2 sentences in Outlook.com reading pane. Clear and direct.';
+
+  try {
+    var res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      body: JSON.stringify({ model: 'claude-haiku-4-5-20251001', max_tokens: 1024, messages: [{ role: 'user', content: prompt }] })
+    });
+    if (!res.ok) { var err = await res.json().catch(function(){return {};}); throw new Error(err.error ? err.error.message : 'API error ' + res.status); }
+    var data = await res.json();
+    var text = data.content && data.content[0] ? data.content[0].text : '';
+    var match = text.match(/\{[\s\S]*\}/);
+    if (!match) throw new Error('Unexpected response format');
+    var s = JSON.parse(match[0]);
+    renderResults(s, subject);
+  } catch(e) {
+    document.getElementById('results').innerHTML = '<div class="error-panel"><div style="font-size:32px;margin-bottom:12px;">⚠️</div><p style="font-size:14px;color:#dc2626;margin-bottom:8px;">Something went wrong. Please try again.</p><p style="font-size:11px;color:#bbb;">' + esc(e.message) + '</p></div>';
+  } finally {
+    btn.disabled = false; btn.textContent = '✨ Generate AI Summaries';
+  }
+}
+
+function renderResults(s, subject) {
+  document.getElementById('results').innerHTML = '<div class="isp-cards">'
+  + '<div class="isp-card gmail"><div class="isp-header"><div class="isp-logo" style="background:white;border:1px solid #eee;"><svg width="18" height="14" viewBox="0 0 24 18" fill="none"><path d="M0 1.636A1.636 1.636 0 0 1 1.636 0L12 8.182 22.364 0A1.636 1.636 0 0 1 24 1.636L12 11.455 0 1.636z" fill="#EA4335"/><path d="M0 1.636v14.728A1.636 1.636 0 0 0 1.636 18h2.728V5.727L0 1.636z" fill="#34A853"/><path d="M24 1.636v14.728A1.636 1.636 0 0 1 22.364 18h-2.728V5.727L24 1.636z" fill="#4285F4"/><path d="M4.364 18V5.727L12 11.455l7.636-5.728V18H4.364z" fill="#FBBC05"/></svg></div><span class="isp-name" style="color:#444;">Gmail</span><span class="isp-badge" style="background:#e8f0fe;color:#1967d2;">✦ Google AI</span></div><div class="isp-body"><div class="email-row"><div class="avatar" style="background:#ea4335;">O</div><div class="email-content"><div class="email-sender">Ooze Life</div><div class="email-subject">' + esc(subject) + '</div><div class="ai-block"><div class="ai-tag" style="color:#1967d2;">✦ Summary</div><div class="ai-text">' + esc(s.gmail) + '</div></div></div><div class="email-time">now</div></div></div></div>'
+  + '<div class="isp-card apple"><div class="isp-header"><div class="isp-logo" style="background:#2c2c2e;"><svg width="15" height="15" viewBox="0 0 24 24" fill="#fff"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg></div><span class="isp-name">Mail</span><span class="isp-badge">Apple Intelligence</span></div><div class="isp-body"><div class="email-row"><div class="avatar" style="background:#30d158;">O</div><div class="email-content"><div style="display:flex;justify-content:space-between;"><div class="email-sender" style="color:#fff;">Ooze Life</div><div class="email-time" style="color:#555;">now</div></div><div class="email-subject" style="color:rgba(255,255,255,0.9);margin-bottom:2px;">' + esc(subject) + '</div><div class="ai-text" style="color:#8e8e93;font-size:12.5px;">' + esc(s.apple_mail) + '</div><div style="margin-top:6px;"><span style="font-size:10px;color:#555;background:rgba(255,255,255,0.08);padding:2px 7px;border-radius:5px;">✦ AI Summary</span></div></div></div></div></div>'
+  + '<div class="isp-card outlook"><div class="isp-header"><div class="isp-logo" style="background:#0f6cbd;"><svg width="16" height="16" viewBox="0 0 24 18" fill="white"><path d="M0 0h24v2L12 11 0 2V0zm0 4l12 9 12-9v14H0V4z"/></svg></div><span class="isp-name">Outlook</span><span class="isp-badge">✦ Copilot</span></div><div class="isp-body"><div class="email-row"><div class="avatar" style="background:#0f6cbd;">O</div><div class="email-content"><div class="email-sender">Ooze Life</div><div class="email-subject">' + esc(subject) + '</div><div class="ai-block"><div class="ai-tag" style="color:#0f6cbd;">✦ Copilot Summary</div><div class="ai-text">' + esc(s.outlook) + '</div></div></div><div class="email-time">now</div></div></div></div>'
+  + '<div class="isp-card yahoo"><div class="isp-header"><div class="isp-logo" style="background:#6001d2;color:white;font-size:13px;letter-spacing:-1px;">Y!</div><span class="isp-name">Yahoo Mail</span><span class="isp-badge">✦ AI Preview</span></div><div class="isp-body"><div class="email-row"><div class="avatar" style="background:#6001d2;">O</div><div class="email-content"><div class="email-sender">Ooze Life</div><div class="email-subject">' + esc(subject) + '</div><div class="ai-block"><div class="ai-tag" style="color:#6001d2;">✦ AI Summary</div><div class="ai-text">' + esc(s.yahoo) + '</div></div></div><div class="email-time">now</div></div></div></div>'
+  + '<div class="isp-card hotmail"><div class="isp-header"><div class="isp-logo" style="background:#0078d4;"><svg width="15" height="15" viewBox="0 0 24 24" fill="white"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg></div><span class="isp-name">Hotmail / Outlook.com</span><span class="isp-badge">✦ AI Summary</span></div><div class="isp-body"><div class="email-row"><div class="avatar" style="background:#0078d4;">O</div><div class="email-content"><div class="email-sender">Ooze Life</div><div class="email-subject">' + esc(subject) + '</div><div class="ai-block"><div class="ai-tag" style="color:#0078d4;">AI Summary</div><div class="ai-text">' + esc(s.hotmail) + '</div></div></div><div class="email-time">now</div></div></div></div>'
+  + '</div><div class="tip-bar">💡 <strong>Tips:</strong> Front-load your key message — AI reads top-to-bottom and weights early content heavily. Vague openers like "Don\'t miss out" give AI less to work with than specific offers like "25% off all pens today only."</div>';
+}
+</script>
+</body>
+</html>
